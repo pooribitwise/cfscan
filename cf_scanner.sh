@@ -5,11 +5,13 @@ INPUT_FILE="subnets.txt"
 OUTPUT_FILE="ipv4.txt"
 TOP_20_FILE="top20_ips.txt"
 FINAL_SPEED_FILE="best_ips_with_speed.txt"
+FINAL_TABLE="final_top_ips.txt"
 
 # clear old ones
 > "$OUTPUT_FILE"
 > "$TOP_20_FILE"
 > "$FINAL_SPEED_FILE"
+> "$FINAL_TABLE"
 
 echo "Downloading the CIDRs..."
 curl -s "https://www.cloudflare.com/ips-v4/" -o "$INPUT_FILE"
@@ -55,6 +57,9 @@ while read -r IP PING; do
 done < "$TOP_20_FILE"
 
 echo "Sorting final results by Download Speed..."
-sort -k3 -n -r "$FINAL_SPEED_FILE" > "final_top_ips.txt"
+# creating fancy table
+echo -e "IP Address      Ping      Download Speed" > "$FINAL_TABLE"
+echo "------------------------------------------" >> "$FINAL_TABLE"
+sort -k3 -n -r "$FINAL_SPEED_FILE" | awk '{printf "%-15s %-9s %-10s\n", $1, $2"ms", $3" MB/s"}' >> "$FINAL_TABLE"
 
-echo "Done! The top 20 IPs have been saved to $FINAL_SPEED_FILE"
+echo "Done! The top 20 IPs have been saved to $FINAL_TABLE"
