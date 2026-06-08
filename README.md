@@ -6,7 +6,7 @@ daily to make the cat and mouse game more difficult.
 ## Summary:
 This scripts downloads the fresh netmasks in form of CIDR from cloudflares legitimate webpage using
 curl. Stores the subnets in **subnets.txt**.
-Then selects random 50 IPs for each subnet using nmap tool and starts pinging them four times with
+Then selects random 100 IPs for each subnet using nmap tool and starts pinging them four times with
 200ms timeout. Then writes the sorted ips in **ipv4.txt** and the best 20 ones in **top20_ips.txt**.
 In the next step, it tests the download speed of the top 20 pinged working IPs using curl and the
 owns Cloudflare speed test page. Writes it results in **best_ips_with_speed.txt**.

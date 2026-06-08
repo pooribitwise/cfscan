@@ -16,7 +16,7 @@ FINAL_TABLE="final_top_ips.txt"
 echo "Downloading the CIDRs..."
 curl -s "https://www.cloudflare.com/ips-v4/" -o "$INPUT_FILE"
 
-echo "Scanning 50 random IPs for each subnet (Super Fast!)..."
+echo "Scanning 100 random IPs for each subnet (Super Fast!)..."
 
 while read -r subnet; do
     if [[ -z "$subnet" ]]; then
@@ -26,7 +26,7 @@ while read -r subnet; do
     echo "Scanning: $subnet"
 
     # get random ips using nmap
-    RANDOM_IPS=$(nmap -sL -n "$subnet" | awk '/Nmap scan report for/{print $5}' | shuf -n 50)
+    RANDOM_IPS=$(nmap -sL -n "$subnet" | awk '/Nmap scan report for/{print $5}' | shuf -n 200)
 
     # ping the ips and clean output
     fping -q -C 4 -r 0 -t 200 $RANDOM_IPS 2>&1 | grep -v "-" | awk '{print $1, $3}' >> "$OUTPUT_FILE"
@@ -42,9 +42,10 @@ while read -r IP PING; do
     echo -n "Testing $IP (Ping: ${PING}ms)...";
 
     # 25 MB in 5 secs test
-    SPEED_BPS=$(curl -s --connect-timeout 2 --max-time 5 \
+    SPEED_BPS=$(curl -sk -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+        --connect-timeout 2 --max-time 10 \
         --resolve "speed.cloudflare.com:443:$IP" \
-        "https://speed.cloudflare.com/__down?bytes=25000000" \
+        "https://speed.cloudflare.com/__down?bytes=15000000" \
         -o /dev/null -w "%{speed_download}")
 
     if [[ -z "$SPEED_BPS" || "$SPEED_BPS" == "0.000" ]]; then
